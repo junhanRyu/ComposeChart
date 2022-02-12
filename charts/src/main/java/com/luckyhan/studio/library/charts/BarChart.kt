@@ -40,8 +40,8 @@ fun BarChart(
     labelSize: Float = 16f,
     labelVerticalPadding: Float = 8f,
     countOfGuidelines: Int = 0,
-    xAxis : Boolean = true,
-    yAxis : Boolean = true,
+    xAxis: Boolean = true,
+    yAxis: Boolean = true,
     xLabel: Boolean = true,
     xLabelColor: Color = MaterialTheme.colors.onSurface,
     yLabelColor: Color = MaterialTheme.colors.onSurface,
@@ -98,7 +98,7 @@ fun BarChart(
                     it.nativeCanvas.drawText(
                         guidelineValue.toString(),
                         (otherSpaceWidth) / 2f - axisStrokeWidth,
-                        yPosition,
+                        yPosition + (rect.height()/2),
                         yPaint
                     )
                 }
@@ -168,7 +168,7 @@ fun BarChart(
 
 
 
-        if(xAxis){
+        if (xAxis) {
             // x axis
             drawLine(
                 xAxisColor,
@@ -178,7 +178,7 @@ fun BarChart(
             )
         }
 
-        if(yAxis){
+        if (yAxis) {
             // y axis
             drawLine(
                 yAxisColor,
@@ -206,5 +206,12 @@ fun BarsPreview() {
         BarModel(300, "8", MaterialTheme.colors.primary),
         BarModel(200, "9", MaterialTheme.colors.primary),
     )
-    BarChart(modifier = Modifier.size(200.dp), barModels = bars, yAxis = false, minValue = 0, maxValue = 600, countOfGuidelines = 3)
+    BarChart(
+        modifier = Modifier.size(200.dp),
+        barModels = bars,
+        yAxis = false,
+        minValue = 0,
+        maxValue = 600,
+        countOfGuidelines = 3
+    )
 }

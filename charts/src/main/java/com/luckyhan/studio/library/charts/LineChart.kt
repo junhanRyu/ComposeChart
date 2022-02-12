@@ -70,7 +70,6 @@ fun LineChart(
             if (lineChartModels.isNotEmpty()) (totalPaddingSize / (lineChartModels.size + 1)) else 0f
         val barWidth =
             if (lineChartModels.isNotEmpty()) (totalBarsSize / lineChartModels.size).toFloat() else 0f
-        val barMaxValue = lineChartModels.maxByOrNull { it.value }?.value ?: 1
         val barHeightRatio = barSpaceHeight / maxValue
 
         val xPaint = Paint()
@@ -104,7 +103,7 @@ fun LineChart(
                     it.nativeCanvas.drawText(
                         guidelineValue.toString(),
                         (otherSpaceWidth) / 2f - axisStrokeWidth,
-                        yPosition,
+                        yPosition + (rect.height()/2),
                         yPaint
                     )
                 }
@@ -232,7 +231,7 @@ fun LineChartPreview() {
         modifier = Modifier.size(200.dp),
         lineChartModels = bars,
         minValue = 0,
-        maxValue = 600,
+        maxValue = 24,
         countOfGuidelines = 5,
         yAxis = false,
         xLabel = false
