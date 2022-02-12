@@ -68,11 +68,14 @@ fun MyApp(modifier: Modifier = Modifier) {
                     .padding(horizontal = 16.dp),
                 barModels = bars,
                 axisStrokeWidth = 4f,
-                labelSize= 48f,
+                labelSize = 48f,
                 labelVerticalPadding = 10f,
                 minValue = 0,
-                maxValue = 600
+                maxValue = 600,
+                countOfGuidelines = 3,
+                yAxis = false,
             )
+
             Spacer(modifier = Modifier.height(16.dp))
             LineChart(
                 modifier = Modifier
@@ -83,7 +86,7 @@ fun MyApp(modifier: Modifier = Modifier) {
                 axisStrokeWidth = 6f,
                 lineColor = MaterialTheme.colors.secondary,
                 pointRadius = 12f,
-                labelSize= 48f,
+                labelSize = 48f,
                 labelVerticalPadding = 12f,
                 minValue = 0,
                 maxValue = 600

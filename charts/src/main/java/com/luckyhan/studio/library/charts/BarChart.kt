@@ -26,13 +26,25 @@ data class BarModel(
 fun BarChart(
     modifier: Modifier = Modifier,
     axisStrokeWidth: Float = 2f,
-    axisColor: Color = MaterialTheme.colors.onSurface.copy(
+    xAxisColor: Color = MaterialTheme.colors.onSurface.copy(
+        alpha = 0.2f
+    ),
+    yAxisColor: Color = MaterialTheme.colors.onSurface.copy(
+        alpha = 0.2f
+    ),
+    guidelineColor: Color = MaterialTheme.colors.onSurface.copy(
         alpha = 0.2f
     ),
     barPaddingRatio: Float = 0.5f,
     barsSpaceRatio: Float = 0.90f,
     labelSize: Float = 16f,
-    labelVerticalPadding : Float = 8f,
+    labelVerticalPadding: Float = 8f,
+    countOfGuidelines: Int = 0,
+    xAxis : Boolean = true,
+    yAxis : Boolean = true,
+    xLabel: Boolean = true,
+    xLabelColor: Color = MaterialTheme.colors.onSurface,
+    yLabelColor: Color = MaterialTheme.colors.onSurface,
     minValue: Int = 0,
     maxValue: Int = 100,
     barModels: List<BarModel> = emptyList()
@@ -55,11 +67,53 @@ fun BarChart(
         val barMaxValue = barModels.maxByOrNull { it.value }?.value ?: 1
         val barHeightRatio = barSpaceHeight / maxValue
 
-        val paint = android.graphics.Paint()
-        paint.textAlign = Paint.Align.CENTER
-        paint.textSize = labelSize
-        paint.color = Color.Black.toArgb()
-        paint.isAntiAlias = true
+        val xPaint = Paint()
+        xPaint.textAlign = Paint.Align.CENTER
+        xPaint.textSize = labelSize
+        xPaint.color = xLabelColor.toArgb()
+        xPaint.isAntiAlias = true
+
+        val yPaint = Paint()
+        yPaint.textAlign = Paint.Align.CENTER
+        yPaint.textSize = labelSize
+        yPaint.color = yLabelColor.toArgb()
+        yPaint.isAntiAlias = true
+
+        if (countOfGuidelines > 0) {
+            //guidelines
+
+            val valueOffset = maxValue / (countOfGuidelines + 1)
+            val yPositionOffset = barSpaceHeight / (countOfGuidelines + 1)
+            var guidelineValue = maxValue - valueOffset
+            var yPosition = yPositionOffset
+            while (guidelineValue > 0) {
+                drawIntoCanvas {
+                    val rect = Rect()
+                    yPaint.getTextBounds(
+                        guidelineValue.toString(),
+                        0,
+                        minValue.toString().length,
+                        rect
+                    )
+                    it.nativeCanvas.drawText(
+                        guidelineValue.toString(),
+                        (otherSpaceWidth) / 2f - axisStrokeWidth,
+                        yPosition,
+                        yPaint
+                    )
+                }
+
+                // x axis
+                drawLine(
+                    guidelineColor,
+                    start = Offset(otherSpaceWidth - lineOffset, yPosition + lineOffset),
+                    end = Offset(size.width, yPosition + lineOffset),
+                    strokeWidth = axisStrokeWidth,
+                )
+                guidelineValue -= valueOffset
+                yPosition += yPositionOffset
+            }
+        }
 
         barModels.forEachIndexed { index, barModel ->
             val barHeight = (barModel.value * barHeightRatio)
@@ -68,63 +122,71 @@ fun BarChart(
                 ((index + 1) * barPadding.toFloat()) + (index * barWidth) + otherSpaceWidth
             drawRect(barModel.color, Offset(xOffset, yOffset), Size(barWidth, barHeight))
 
-            drawIntoCanvas {
-                val rect = Rect()
-                paint.getTextBounds(barModel.label, 0, barModel.label.length, rect)
-                val textWidth = rect.width()
-                val textHeight = rect.height()
-                it.nativeCanvas.drawText(
-                    barModel.label,
-                    xOffset + (barWidth / 2f),
-                    barSpaceHeight + textHeight + axisStrokeWidth + labelVerticalPadding,
-                    paint
-                )
+            if (xLabel) {
+                drawIntoCanvas {
+                    val rect = Rect()
+                    xPaint.getTextBounds(barModel.label, 0, barModel.label.length, rect)
+                    val textWidth = rect.width()
+                    val textHeight = rect.height()
+                    it.nativeCanvas.drawText(
+                        barModel.label,
+                        xOffset + (barWidth / 2f),
+                        barSpaceHeight + textHeight + axisStrokeWidth + labelVerticalPadding,
+                        xPaint
+                    )
+                }
             }
         }
 
         //max
         drawIntoCanvas {
             val rect = Rect()
-            paint.getTextBounds(maxValue.toString(), 0, maxValue.toString().length, rect)
-            val textWidth = rect.width()
+            yPaint.getTextBounds(maxValue.toString(), 0, maxValue.toString().length, rect)
             val textHeight = rect.height()
             it.nativeCanvas.drawText(
                 maxValue.toString(),
                 (otherSpaceWidth) / 2f - axisStrokeWidth,
                 textHeight.toFloat() + 4f,
-                paint
+                yPaint
             )
         }
 
         //min
         drawIntoCanvas {
             val rect = Rect()
-            paint.getTextBounds(minValue.toString(), 0, minValue.toString().length, rect)
-            val textWidth = rect.width()
-            val textHeight = rect.height()
+            yPaint.getTextBounds(minValue.toString(), 0, minValue.toString().length, rect)
             it.nativeCanvas.drawText(
                 minValue.toString(),
                 (otherSpaceWidth) / 2f - axisStrokeWidth,
                 barSpaceHeight,
-                paint
+                yPaint
             )
         }
 
-        // x axis
-        drawLine(
-            axisColor,
-            start = Offset(otherSpaceWidth - lineOffset, barSpaceHeight + lineOffset),
-            end = Offset(size.width, barSpaceHeight + lineOffset),
-            strokeWidth = axisStrokeWidth,
-        )
-        // y axis
-        drawLine(
-            axisColor,
-            start = Offset(otherSpaceWidth - axisStrokeWidth, 0f),
-            end = Offset(otherSpaceWidth - axisStrokeWidth, barSpaceHeight + axisStrokeWidth),
-            strokeWidth = axisStrokeWidth,
-        )
 
+
+
+
+
+        if(xAxis){
+            // x axis
+            drawLine(
+                xAxisColor,
+                start = Offset(otherSpaceWidth - lineOffset, barSpaceHeight + lineOffset),
+                end = Offset(size.width, barSpaceHeight + lineOffset),
+                strokeWidth = axisStrokeWidth,
+            )
+        }
+
+        if(yAxis){
+            // y axis
+            drawLine(
+                yAxisColor,
+                start = Offset(otherSpaceWidth - axisStrokeWidth, 0f),
+                end = Offset(otherSpaceWidth - axisStrokeWidth, barSpaceHeight + axisStrokeWidth),
+                strokeWidth = axisStrokeWidth,
+            )
+        }
 
     }
 }
@@ -144,5 +206,5 @@ fun BarsPreview() {
         BarModel(300, "8", MaterialTheme.colors.primary),
         BarModel(200, "9", MaterialTheme.colors.primary),
     )
-    BarChart(modifier = Modifier.size(200.dp), barModels = bars, minValue = 0, maxValue = 600)
+    BarChart(modifier = Modifier.size(200.dp), barModels = bars, yAxis = false, minValue = 0, maxValue = 600, countOfGuidelines = 3)
 }
