@@ -2,6 +2,27 @@
 
 This is a simple chart library for android compose.
 
+
+* How to
+
+Step 1. Add the JitPack repository to your build file
+```
+allprojects {
+		repositories {
+			...
+			maven { url 'https://jitpack.io' }
+		}
+	}
+```
+
+Step 2. Add the dependency
+```
+dependencies {
+	        implementation 'com.github.junhanRyu:ComposeChart:Tag'
+	}
+```
+
+
 * BarChart
 
 ![compose_barchart](https://user-images.githubusercontent.com/24242836/152200463-acd1ff1e-7b57-40c4-a062-f05c510a9cc8.PNG)
